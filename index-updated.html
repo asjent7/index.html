@@ -1591,10 +1591,13 @@ function buildStep2Forms(rooms){
       html+='<div class="g2"><div class="field"><label>First &amp; Last Name *</label><input type="text" id="det-name-'+m.id+'" value="'+(d.name||'')+'" placeholder="Full name" oninput="saveDet('+m.id+')"></div>';
       html+='<div class="field"><label>Email Address *</label><input type="email" id="det-email-'+m.id+'" value="'+(d.email||'')+'" placeholder="email@example.com" oninput="saveDet('+m.id+')"></div></div>';
       html+='<div class="field"><label>Phone Number *</label><input type="tel" id="det-phone-'+m.id+'" value="'+(d.phone||'')+'" placeholder="(555) 000-0000" oninput="saveDet('+m.id+')"></div>';
-      if(m.type==='performer'){
+      if(!isOcc){
+        var gArReq=m.type==='performer';
         html+='<div class="g2">';
-        html+='<div class="field"><label>Gender <span style="color:#e53e3e">*</span></label><select id="det-gender-'+m.id+'" onchange="saveDet('+m.id+')" required><option value="">Select...</option><option value="Male"'+(d.gender==='Male'?' selected':'')+'>Male</option><option value="Female"'+(d.gender==='Female'?' selected':'')+'>Female</option></select></div>';
-        html+='<div class="field"><label>Age Range <span style="color:#e53e3e">*</span></label><select id="det-agerange-'+m.id+'" onchange="saveDet('+m.id+')" required><option value="">Select...</option>';
+        html+='<div class="field"><label>Gender'+(gArReq?' <span style="color:#e53e3e">*</span>':'')+'</label><select id="det-gender-'+m.id+'" onchange="saveDet('+m.id+')"'+(gArReq?' required':'')+'>'+
+              '<option value="">Select...</option><option value="Male"'+(d.gender==='Male'?' selected':'')+'>Male</option><option value="Female"'+(d.gender==='Female'?' selected':'')+'>Female</option></select></div>';
+        html+='<div class="field"><label>Age Range'+(gArReq?' <span style="color:#e53e3e">*</span>':'')+'</label><select id="det-agerange-'+m.id+'" onchange="saveDet('+m.id+')"'+(gArReq?' required':'')+'>'+
+              '<option value="">Select...</option>';
         var ageRanges=['9–12','12–14','15–17','18–20','21+'];
         for(var ai=0;ai<ageRanges.length;ai++){html+='<option value="'+ageRanges[ai]+'"'+(d.ageRange===ageRanges[ai]?' selected':'')+'>'+ageRanges[ai]+'</option>';}
         html+='</select></div></div>';
@@ -1667,7 +1670,7 @@ function validateStep2(){
     if(!d.name||!d.name.trim()){alert('Please enter a name for all participants.');return false;}
     if(!d.email||!d.email.trim()){alert('Please enter an email for '+(d.name||'a participant')+'.');return false;}
     if(!d.phone||!d.phone.trim()){alert('Please enter a phone number for '+(d.name||'a participant')+'.');return false;}
-    if(!d.gender||!d.ageRange){alert('Please select a gender and age range for all participants.');return false;}
+    if(m.type==='performer'&&(!d.gender||!d.ageRange)){alert('Please select a gender and age range for '+(d.name||'this performer')+'.');return false;}
     if(m.type!=='occupant'&&!d.shirt){alert('Please select a t-shirt size for '+(d.name||'a participant')+'.');return false;}
     if(m.type==='occupant'&&d.shirtAddon&&!d.shirt){alert('Please select a t-shirt size for '+(d.name||'a participant')+'.');return false;}
   }
