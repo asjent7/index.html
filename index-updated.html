@@ -499,7 +499,7 @@ body{background:#0a0a0a!important;color:rgba(255,255,255,.92)!important;-webkit-
   <div style="font-size:16px;font-weight:700;color:var(--gold);margin-bottom:14px;display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="var(--gold)"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>Performer Program</div>
   <div class="fee-cards">
     <div class="fee-card">
-      <div class="fee-card-top"><div class="fee-card-title">Performer Program</div><div class="fee-amount">+$900</div></div>
+      <div class="fee-card-top"><div class="fee-card-title">Performer Program</div><div class="fee-amount">+$900 <span style="font-size:13px;font-weight:400;color:rgba(255,255,255,.55)">(2nd+: $600)</span></div></div>
       <div class="fee-type performer">Performers only</div>
       <ul class="fee-list"><li>Pre-trip and NYC rehearsals &amp; workshops</li><li>ADX Creative Team (Director, Choreographer, Music Director)</li><li>Music Production, Recordings &amp; Sheet Music</li><li>Full Arts For Autism Cast rehearsals with Arts For Autism creative &amp; production team</li><li>Production staffing &amp; coordination</li><li>Performer credentialing, access &amp; security</li><li>Broadway stage performance — Arts For Autism Concert</li><li>Welcome Dinner &amp; Activities</li><li>Performance Day Lunch</li><li>Private Group Rehearsals</li><li>Costumes</li><li>Experience T-Shirt</li></ul>
     </div>
@@ -539,18 +539,22 @@ body{background:#0a0a0a!important;color:rgba(255,255,255,.92)!important;-webkit-
         <tbody>
           <tr class="occ-hdr"><td colspan="4">Quad occupancy — 4 per room</td></tr>
           <tr><td>Performer</td><td>$2,750</td><td>+$900</td><td class="tc">$3,650</td></tr>
+          <tr style="opacity:.75"><td style="padding-left:20px;font-style:italic">Performer 2+</td><td>$2,750</td><td>+$600</td><td class="tc">$3,350</td></tr>
           <tr><td>Chaperone</td><td>$2,750</td><td>+$475</td><td class="tc">$3,225</td></tr>
           <tr><td>Family / Fan</td><td>$2,750</td><td>+$625</td><td class="tc">$3,375</td></tr>
           <tr class="occ-hdr"><td colspan="4">Triple occupancy — 3 per room</td></tr>
           <tr><td>Performer</td><td>$2,888</td><td>+$900</td><td class="tc">$3,788</td></tr>
+          <tr style="opacity:.75"><td style="padding-left:20px;font-style:italic">Performer 2+</td><td>$2,888</td><td>+$600</td><td class="tc">$3,488</td></tr>
           <tr><td>Chaperone</td><td>$2,888</td><td>+$475</td><td class="tc">$3,363</td></tr>
           <tr><td>Family / Fan</td><td>$2,888</td><td>+$625</td><td class="tc">$3,513</td></tr>
           <tr class="occ-hdr"><td colspan="4">Double occupancy — 2 per room</td></tr>
           <tr><td>Performer</td><td>$3,165</td><td>+$900</td><td class="tc">$4,065</td></tr>
+          <tr style="opacity:.75"><td style="padding-left:20px;font-style:italic">Performer 2+</td><td>$3,165</td><td>+$600</td><td class="tc">$3,765</td></tr>
           <tr><td>Chaperone</td><td>$3,165</td><td>+$475</td><td class="tc">$3,640</td></tr>
           <tr><td>Family / Fan</td><td>$3,165</td><td>+$625</td><td class="tc">$3,790</td></tr>
           <tr class="occ-hdr"><td colspan="4">Private room — 1 per room</td></tr>
           <tr><td>Performer</td><td>$3,996</td><td>+$900</td><td class="tc">$4,896</td></tr>
+          <tr style="opacity:.75"><td style="padding-left:20px;font-style:italic">Performer 2+</td><td>$3,996</td><td>+$600</td><td class="tc">$4,596</td></tr>
           <tr><td>Chaperone</td><td>$3,996</td><td>+$475</td><td class="tc">$4,471</td></tr>
           <tr><td>Family / Fan</td><td>$3,996</td><td>+$625</td><td class="tc">$4,621</td></tr>
           <tr class="occ-hdr"><td colspan="4">Room occupant add-on</td></tr>
@@ -698,6 +702,7 @@ body{background:#0a0a0a!important;color:rgba(255,255,255,.92)!important;-webkit-
     </div>
 
     <div id="live-estimate"></div>
+    <div id="multi-perf-banner" style="display:none"></div>
     <div id="saving-nudge"></div>
     <div class="cta-row"><button class="btn-forward" onclick="goStep2()">Participant Details →</button></div>
   </div>
@@ -963,6 +968,7 @@ body{background:#0a0a0a!important;color:rgba(255,255,255,.92)!important;-webkit-
 <script>
 var PRICE = {quad:{performer:3650,chaperone:3225,fan:3375},triple:{performer:3788,chaperone:3363,fan:3513},double:{performer:4065,chaperone:3640,fan:3790},single:{performer:4896,chaperone:4471,fan:4621}};
 var OCC_FLAT=200, AIRFARE=525;
+var PERF_MULTI_DISCOUNT=300;
 var DEPS = {'15':197,'14':197,'13':197,'12':197,'11':350,'10':350,'9':350,'8':500,'7':500,'6':500,'full':0};
 var MOS  = {'15':14,'14':13,'13':12,'12':11,'11':10,'10':9,'9':8,'8':7,'7':6,'6':5,'full':0};
 var scenario='A', occType='quad', plan='12', pCtr=0;
@@ -1358,24 +1364,31 @@ function renderPlanGrid(){
 
 function buildRoomSummaries(){
   var rooms=[];
+  var perfRank=0;
+  function mkMember(m,rk){
+    var p,isMulti=false;
+    if(m.type==='performer'){perfRank++;isMulti=perfRank>1;p=(PRICE[rk]||PRICE.quad).performer-(isMulti?PERF_MULTI_DISCOUNT:0);}
+    else{p=participantPrice(rk,m.type);}
+    return{id:m.id,type:m.type,roomKey:rk,price:p,isMultiPerf:isMulti,expFee:m.type==='performer'?(isMulti?600:900):m.type==='chaperone'?475:m.type==='fan'?625:0,airfare:m.airfare};
+  }
   if(scenario==='A'){
     if(aPerformers.length){
       var base=0,air=0;
-      var mems=aPerformers.map(function(p){base+=participantPrice(occType,'performer');if(p.airfare)air+=AIRFARE;return{id:p.id,type:'performer',roomKey:occType,price:participantPrice(occType,'performer'),airfare:p.airfare};});
+      var mems=aPerformers.map(function(p){var mem=mkMember(p,occType);base+=mem.price;if(p.airfare)air+=AIRFARE;return mem;});
       rooms.push({label:'Performer Room · '+roomLabel(occType),members:mems,base:base,air:air,total:base+air});
     }
     for(var ri=0;ri<aFamilyRooms.length;ri++){
       var r=aFamilyRooms[ri];
       var rk=autoRoomKey(r.members.length);
       var rb=0,ra=0;
-      var rm=r.members.map(function(m){var p=participantPrice(rk,m.type);rb+=p;if(m.airfare)ra+=AIRFARE;return{id:m.id,type:m.type,roomKey:rk,price:p,airfare:m.airfare};});
+      var rm=r.members.map(function(m){var mem=mkMember(m,rk);rb+=mem.price;if(m.airfare)ra+=AIRFARE;return mem;});
       rooms.push({label:'Family Room '+(ri+1)+' · '+roomLabel(rk),members:rm,base:rb,air:ra,total:rb+ra});
     }
   }
   if(scenario==='B'){
     var bpc=bMembers.filter(function(m){return m.type!=='occupant';}).length;
     var rk2=autoRoomKey(Math.max(1,bpc));var bb=0,ba=0;
-    var bm=bMembers.map(function(m){var p=participantPrice(rk2,m.type);bb+=p;if(m.airfare)ba+=AIRFARE;return{id:m.id,type:m.type,roomKey:rk2,price:p,airfare:m.airfare};});
+    var bm=bMembers.map(function(m){var mem=mkMember(m,rk2);bb+=mem.price;if(m.airfare)ba+=AIRFARE;return mem;});
     rooms.push({label:'Family Room · '+roomLabel(rk2),members:bm,base:bb,air:ba,total:bb+ba});
   }
   if(scenario==='C'){
@@ -1384,7 +1397,7 @@ function buildRoomSummaries(){
       var pc=cr.members.filter(function(m){return m.type!=='occupant';}).length;
       var crk=autoRoomKey(Math.max(1,pc));
       var cb=0,ca=0;
-      var cm=cr.members.map(function(m){var p=participantPrice(crk,m.type);cb+=p;if(m.airfare)ca+=AIRFARE;return{id:m.id,type:m.type,roomKey:crk,price:p,airfare:m.airfare};});
+      var cm=cr.members.map(function(m){var mem=mkMember(m,crk);cb+=mem.price;if(m.airfare)ca+=AIRFARE;return mem;});
       rooms.push({label:'Private Room '+(ci+1)+' · '+roomLabel(crk),members:cm,base:cb,air:ca,total:cb+ca});
     }
   }
@@ -1409,6 +1422,9 @@ function buildEstimateRows(rooms){
   var rows='';
   var airByType={performer:0,chaperone:0,fan:0,occupant:0};
   var shirtOcc=0;
+  var allPerfs=[];
+  for(var ri2=0;ri2<rooms.length;ri2++) for(var mi2=0;mi2<rooms[ri2].members.length;mi2++) if(rooms[ri2].members[mi2].type==='performer') allPerfs.push(rooms[ri2].members[mi2]);
+  var hasMultiPerf=allPerfs.length>1;
   for(var ri=0;ri<rooms.length;ri++){
     var r=rooms[ri];
     rows+='<div class="r-row"><span class="rl" style="font-weight:600;color:var(--white)">'+r.label+'</span><span class="rv">'+fmt(r.base)+'</span></div>';
@@ -1419,8 +1435,17 @@ function buildEstimateRows(rooms){
       var t=tkeys[ti];var grp=groups[t];
       if(!grp||!grp.length) continue;
       var baseSubtotal=grp.reduce(function(a,m){return a+m.price;},0);
-      var label=typeLabel(t)+(grp.length>1?' ('+grp.length+' @ '+fmt(grp[0].price)+')':'');
-      rows+='<div class="r-row r-sub"><span class="rl" style="padding-left:12px">↳ '+label+'</span><span class="rv">'+fmt(baseSubtotal)+'</span></div>';
+      if(t==='performer'&&hasMultiPerf){
+        rows+='<div class="r-row r-sub"><span class="rl" style="padding-left:12px">↳ Performer'+(grp.length>1?' ('+grp.length+')')+'</span><span class="rv">'+fmt(baseSubtotal)+'</span></div>';
+        for(var pi=0;pi<grp.length;pi++){
+          var pm=grp[pi];var perfNum=allPerfs.indexOf(pm)+1;
+          var savNote=pm.isMultiPerf?'<span style="font-size:11px;color:#81c784"> · −$300 Multi-Family Savings</span>':'';
+          rows+='<div class="r-row r-sub"><span class="rl" style="padding-left:24px;font-size:12px;color:var(--muted)">↳ Performer '+perfNum+' · exp. fee $'+pm.expFee+savNote+'</span><span class="rv" style="font-size:12px">'+fmt(pm.price)+'</span></div>';
+        }
+      }else{
+        var label=typeLabel(t)+(grp.length>1?' ('+grp.length+' @ '+fmt(grp[0].price)+')':'');
+        rows+='<div class="r-row r-sub"><span class="rl" style="padding-left:12px">↳ '+label+'</span><span class="rv">'+fmt(baseSubtotal)+'</span></div>';
+      }
       var ac=grp.filter(function(m){return m.airfare;}).length;
       if(ac>0) airByType[t]=(airByType[t]||0)+ac;
       if(t==='occupant') shirtOcc+=grp.filter(function(m){return details[m.id]&&details[m.id].shirtAddon;}).length;
@@ -1458,10 +1483,22 @@ function calcFullDiscount(rooms){
   return{totalDiscount:Math.round(totalDiscount*100)/100,discountRows:discountRows};
 }
 
+function updateMultiPerfBanner(allMembers){
+  var banner=document.getElementById('multi-perf-banner');
+  if(!banner) return;
+  var perfCount=allMembers.filter(function(m){return m.type==='performer';}).length;
+  if(perfCount>=2){
+    banner.style.display='block';
+    banner.innerHTML='<div style="background:#E5B824;color:#000;padding:12px 16px;border-radius:8px;font-weight:600;font-size:13px;margin-bottom:12px">🎭 Multi-Performer Family Savings Applied! You\'re saving $300 on each additional performer.</div>';
+  }else{
+    banner.style.display='none';
+    banner.innerHTML='';
+  }
+}
 function calcAndRender(){
   var rooms=buildRoomSummaries();
   var el=document.getElementById('live-estimate');
-  if(!el||!rooms.length||rooms.every(function(r){return !r.members.length;})){if(el)el.innerHTML='';return;}
+  if(!el||!rooms.length||rooms.every(function(r){return !r.members.length;})){if(el)el.innerHTML='';var mpb=document.getElementById('multi-perf-banner');if(mpb){mpb.style.display='none';mpb.innerHTML='';}return;}
   var t=calcTotals(rooms);
   var rows=buildEstimateRows(rooms);
   var planLabels={'15':'15-Month','14':'14-Month','13':'13-Month','12':'12-Month Early Bird','11':'11-Month','10':'10-Month','9':'9-Month','8':'8-Month','7':'7-Month','6':'6-Month','full':'Pay in Full'};
@@ -1477,6 +1514,7 @@ function calcAndRender(){
   var depNote=plan==='full'&&discountTotal>0?'<div style="padding:8px 16px 12px;font-size:11px;color:#81c784;text-align:center;line-height:1.5">💵 Save up to 15% on experience fees when you pay in full. Discounts do not apply to airfare or travel fees.</div>':'';
   el.innerHTML='<div class="res-card"><div class="res-hdr"><span class="res-hdr-l">Trip Estimate</span><span class="res-hdr-r">'+planLabels[plan]+'</span></div><div class="res-body">'+rows+discRows+'<div class="r-row r-total"><span class="rl">Total Trip Investment</span><span class="rv">'+fmt(discountedGrand)+'</span></div>'+payRows+'</div>'+depNote+'</div>';
   updateSavingNudge();
+  updateMultiPerfBanner(t.allMembers);
 }
 
 function updateSavingNudge(){
