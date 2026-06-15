@@ -1375,7 +1375,7 @@ function buildRoomSummaries(){
   if(scenario==='A'){
     if(aPerformers.length){
       var base=0,air=0;
-      var mems=aPerformers.map(function(perf,idx){var isMulti=idx>0;var bp=(PRICE[occType]||PRICE.quad).performer-(isMulti?PERF_MULTI_DISCOUNT:0);var mem={id:perf.id,type:perf.type||'performer',roomKey:occType,price:bp,isMultiPerf:isMulti,expFee:isMulti?600:900,airfare:perf.airfare};base+=bp;if(perf.airfare)air+=AIRFARE;return mem;});
+      var mems=aPerformers.map(function(perf,idx){var isMulti=idx>0;var expFee=isMulti?600:900;var travelBase=(PRICE[occType]||PRICE.quad).performer-900;var bp=travelBase+expFee;var mem={id:perf.id,type:'performer',roomKey:occType,price:bp,isMultiPerf:isMulti,expFee:expFee,airfare:perf.airfare};base+=bp;if(perf.airfare)air+=AIRFARE;return mem;});
       rooms.push({label:'Performer Room · '+roomLabel(occType),members:mems,base:base,air:air,total:base+air});
     }
     for(var ri=0;ri<aFamilyRooms.length;ri++){
@@ -1436,7 +1436,7 @@ function buildEstimateRows(rooms){
       var t=tkeys[ti];var grp=groups[t];
       if(!grp||!grp.length) continue;
       var baseSubtotal=grp.reduce(function(a,m){return a+m.price;},0);
-      if(t==='performer'&&hasMultiPerf){
+      if(t==='performer'&&grp.length>1){
         rows+='<div class="r-row r-sub"><span class="rl" style="padding-left:12px">↳ Performer'+(grp.length>1?' ('+grp.length+')':'')+'</span><span class="rv">'+fmt(baseSubtotal)+'</span></div>';
         for(var pi=0;pi<grp.length;pi++){
           var pm=grp[pi];var perfNum=allPerfs.indexOf(pm)+1;
