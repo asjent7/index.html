@@ -1498,7 +1498,7 @@ function updateMultiPerfBanner(allMembers){
 function calcAndRender(){
   var rooms=buildRoomSummaries();
   var el=document.getElementById('live-estimate');
-  if(!el||!rooms.length||rooms.every(function(r){return !r.members.length;})){if(el)el.innerHTML='';var mpb=document.getElementById('multi-perf-banner');if(mpb){mpb.style.display='none';mpb.innerHTML='';}return;}
+  if(!el||!rooms.length||rooms.every(function(r){return !r.members.length;})){if(el)el.innerHTML='';return;}
   var t=calcTotals(rooms);
   var rows=buildEstimateRows(rooms);
   var planLabels={'15':'15-Month','14':'14-Month','13':'13-Month','12':'12-Month Early Bird','11':'11-Month','10':'10-Month','9':'9-Month','8':'8-Month','7':'7-Month','6':'6-Month','full':'Pay in Full'};
@@ -1512,9 +1512,9 @@ function calcAndRender(){
     payRows+='<div class="r-row r-mo"><span class="rl">Monthly payment × '+MOS[plan]+' months</span><span class="rv">'+fmt(moAfterDep)+'/mo</span></div>';
   }
   var depNote=plan==='full'&&discountTotal>0?'<div style="padding:8px 16px 12px;font-size:11px;color:#81c784;text-align:center;line-height:1.5">💵 Save up to 15% on experience fees when you pay in full. Discounts do not apply to airfare or travel fees.</div>':'';
-  el.innerHTML='<div class="res-card"><div class="res-hdr"><span class="res-hdr-l">Trip Estimate</span><span class="res-hdr-r">'+planLabels[plan]+'</span></div><div class="res-body">'+rows+discRows+'<div class="r-row r-total"><span class="rl">Total Trip Investment</span><span class="rv">'+fmt(discountedGrand)+'</span></div>'+payRows+'</div>'+depNote+'</div>';
+  var mpBanner=t.perfCount>=2?'<div style="background:#E5B824;color:#000;padding:14px 18px;font-weight:700;font-size:14px;text-align:center;border-radius:8px;margin-bottom:10px;letter-spacing:.01em">🎭 Multi-Performer Family Savings Applied — You are saving $300 on Performer 2+</div>':'';
+  el.innerHTML=mpBanner+'<div class="res-card"><div class="res-hdr"><span class="res-hdr-l">Trip Estimate</span><span class="res-hdr-r">'+planLabels[plan]+'</span></div><div class="res-body">'+rows+discRows+'<div class="r-row r-total"><span class="rl">Total Trip Investment</span><span class="rv">'+fmt(discountedGrand)+'</span></div>'+payRows+'</div>'+depNote+'</div>';
   updateSavingNudge();
-  updateMultiPerfBanner(t.allMembers);
 }
 
 function updateSavingNudge(){
@@ -1594,9 +1594,9 @@ function buildStep2Forms(rooms){
       if(!isOcc){
         var gArReq=m.type==='performer';
         html+='<div class="g2">';
-        html+='<div class="field"><label>Gender'+(gArReq?' <span style="color:#e53e3e">*</span>':'')+'</label><select id="det-gender-'+m.id+'" onchange="saveDet('+m.id+')"'+(gArReq?' required':'')+'>'+
+        html+='<div class="field"><label>Gender'+(gArReq?' <span style="color:#e53e3e">*</span>':'')+'</label><select id="det-gender-'+m.id+'" onchange="saveDet('+m.id+')">'+
               '<option value="">Select...</option><option value="Male"'+(d.gender==='Male'?' selected':'')+'>Male</option><option value="Female"'+(d.gender==='Female'?' selected':'')+'>Female</option></select></div>';
-        html+='<div class="field"><label>Age Range'+(gArReq?' <span style="color:#e53e3e">*</span>':'')+'</label><select id="det-agerange-'+m.id+'" onchange="saveDet('+m.id+')"'+(gArReq?' required':'')+'>'+
+        html+='<div class="field"><label>Age Range'+(gArReq?' <span style="color:#e53e3e">*</span>':'')+'</label><select id="det-agerange-'+m.id+'" onchange="saveDet('+m.id+')">'+
               '<option value="">Select...</option>';
         var ageRanges=['9–12','12–14','15–17','18–20','21+'];
         for(var ai=0;ai<ageRanges.length;ai++){html+='<option value="'+ageRanges[ai]+'"'+(d.ageRange===ageRanges[ai]?' selected':'')+'>'+ageRanges[ai]+'</option>';}
