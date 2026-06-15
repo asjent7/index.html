@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- v2 gender-fix -->
 <html lang="en" style="background:#0a0a0a;color-scheme:dark">
 <head>
 <meta charset="UTF-8">
@@ -1670,7 +1671,8 @@ function validateStep2(){
     if(!d.name||!d.name.trim()){alert('Please enter a name for all participants.');return false;}
     if(!d.email||!d.email.trim()){alert('Please enter an email for '+(d.name||'a participant')+'.');return false;}
     if(!d.phone||!d.phone.trim()){alert('Please enter a phone number for '+(d.name||'a participant')+'.');return false;}
-    if(m.type==='performer'&&(!d.gender||!d.ageRange)){alert('Please select a gender and age range for '+(d.name||'this performer')+'.');return false;}
+    // Gender and age required for performers only
+    if(m.type==='performer'){if(!d.gender||!d.ageRange){alert('Please select a gender and age range for '+(d.name||'this performer')+'.');return false;}}
     if(m.type!=='occupant'&&!d.shirt){alert('Please select a t-shirt size for '+(d.name||'a participant')+'.');return false;}
     if(m.type==='occupant'&&d.shirtAddon&&!d.shirt){alert('Please select a t-shirt size for '+(d.name||'a participant')+'.');return false;}
   }
